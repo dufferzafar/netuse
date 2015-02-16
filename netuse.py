@@ -113,13 +113,13 @@ def calculate(lst):
     return total
 
 
-total_download = calculate(download_list) // 1024 * 1024
-total_upload = calculate(upload_list) // 1024 * 1024
+total_download = calculate(download_list) // (1024 * 1024)
+total_upload = calculate(upload_list) // (1024 * 1024)
 
 data_left = Total_Data - total_download
-days_left = date(s_year, s_month+1, s_day) - date.today()
+days_left = (date(s_year, s_month+1, s_day) - date.today()).days
 
-suggested = data_left // days_left.days
+suggested = data_left // days_left
 
 output = \
 """\
@@ -127,8 +127,9 @@ Downloaded:\t%4d MB
 Uploaded:\t%4d MB
 
 Data Left:\t%4d MB
+Days Left:\t%4d Days
 
 Suggested:\t%4d MB (Per Day)
-""" % (total_download, total_upload, data_left, suggested)
+""" % (total_download, total_upload, data_left, days_left, suggested)
 
 print(output)
