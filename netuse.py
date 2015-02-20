@@ -11,11 +11,14 @@ to write my custom shit.
 
 """
 
+import sys
 import os
 join = os.path.join
 
 # Used for suggested internet usage calculation
 from datetime import date
+
+################################################################
 
 # Convert string to integer, empty string is zero.
 to_int = lambda s: int(s) if s.strip() else 0
@@ -30,7 +33,7 @@ Total_Data = 7 * 1024
 
 # Difference between epochs of data points
 # (in seconds)
-Epoch_Diff = 10 * 60
+Epoch_Diff = 10 * 60 + 5
 
 # Folder where log files are stored
 Logfiles_Path = os.path.expanduser("~/.net/")
@@ -38,49 +41,63 @@ Logfiles_Path = os.path.expanduser("~/.net/")
 ################################################################
 
 months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-          "Jul", "Aug", "Sep", "Oct", "Nov", "Dev"]
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 s_day, s_month, s_year = map(int, Start_Period.split("/"))
 
-download_list = []
-upload_list = []
 
-# Read in data from files and build a list
-for month in months[s_month - 1:]:
+def gen_file_list():
+    """ Generate a list of files to read in. """
 
-    # Break when month doesn't yet exist
-    if not os.path.isdir(join(Logfiles_Path, month)):
-        break
+    down_filelist = []
+    up_filelist = []
 
-    print("%s: " % month, end='')
+    # Read in data from files and build a list
+    for month in months[s_month - 1:]:
 
-    down_path = join(Logfiles_Path, month, "down")
-    up_path = join(Logfiles_Path, month, "up")
+        # Break when month doesn't yet exist
+        if not os.path.isdir(join(Logfiles_Path, month)):
+            break
 
-    if month == months[s_month - 1]:
-        days = range(s_day, 32)
-    else:
-        days = range(1, 32)
+        print("%s: " % month, end='')
 
-    for day in days:
-        day = "%02d" % day
+        down_path = join(Logfiles_Path, month, "down")
+        up_path = join(Logfiles_Path, month, "up")
 
-        # Skip when day doesn't exist
-        if not os.path.isfile(join(down_path, day)):
-            continue
+        if month == months[s_month - 1]:
+            days = range(s_day, 32)
+        else:
+            days = range(1, 32)
 
-        print("%s, " % day, end='')
+        for day in days:
+            day = "%02d" % day
 
-        # Read in the up/down logs
-        with open(join(down_path, day)) as f:
-            download_list.extend([tuple(map(to_int, s.split(";")))
-                                  for s in f.readlines()])
+            # Skip when day doesn't exist
+            if not os.path.isfile(join(down_path, day)):
+                continue
 
-        with open(join(up_path, day)) as f:
-            upload_list.extend([tuple(map(to_int, s.split(";")))
-                                for s in f.readlines()])
+            print("%s, " % day, end='')
 
-    print('\n')
+            # Read in the up/down logs
+            down_filelist.append(join(down_path, day))
+            up_filelist.append(join(up_path, day))
+
+        print('\n')
+
+    return down_filelist, up_filelist
+
+
+def read_files(files):
+    """ Read files and generate tuples of (data,epoch). """
+
+    lst = []
+
+    for _file in files:
+        with open(_file) as f:
+            lst.extend([tuple(map(to_int, s.split(";")))
+                        for s in f.readlines()])
+
+    return lst
 
 
 def calculate(lst):
@@ -101,35 +118,65 @@ def calculate(lst):
         duration = current[1] - previous[1]
 
         if duration <= Epoch_Diff:
-            if usage > 0:
+            if usage >= 0:
                 total += usage
+                # print(">0", total, usage)
             else:
                 total += current[0]
+                # print("E1", total, current[0])
         else:
             total += current[0]
+            # print("E2", total, current[0])
 
         previous = current
 
     return total
 
 
-total_download = calculate(download_list) // (1024 * 1024)
-total_upload = calculate(upload_list) // (1024 * 1024)
+def month():
+    """ Print stats for the current month. """
 
-data_left = Total_Data - total_download
-days_left = (date(s_year, s_month+1, s_day) - date.today()).days
+    down_filelist, up_filelist = gen_file_list()
 
-suggested = data_left // days_left
+    total_download = calculate(read_files(down_filelist)) // (1024 * 1024)
+    total_upload = calculate(read_files(up_filelist)) // (1024 * 1024)
 
-output = \
-"""\
-Downloaded:\t%4d MB
-Uploaded:\t%4d MB
+    data_left = Total_Data - total_download
+    days_left = (date(s_year, s_month + 1, s_day) - date.today()).days
 
-Data Left:\t%4d MB
-Days Left:\t%4d Days
+    suggested = data_left // days_left
 
-Suggested:\t%4d MB (Per Day)
-""" % (total_download, total_upload, data_left, days_left, suggested)
+    output = (
+        "Downloaded:\t%4d MB \n"
+        "Uploaded:\t%4d MB \n\n"
+        "Data Left:\t%4d MB \n"
+        "Days Left:\t%4d Days \n\n"
+        "Suggested:\t%4d MB (Per Day) \n"
+    ) % (total_download, total_upload, data_left, days_left, suggested)
 
-print(output)
+    print(output)
+
+
+def today():
+    t = date.today()
+
+    download = calculate(read_files(
+        [join(Logfiles_Path, t.strftime('%b'), "down", t.strftime('%d'))])) // (1024 * 1024)
+
+    upload = calculate(read_files(
+        [join(Logfiles_Path, t.strftime('%b'), "up", t.strftime('%d'))])) // (1024 * 1024)
+
+    output = (
+        "Downloaded:\t%4d MB \n"
+        "Uploaded:\t%4d MB \n"
+    ) % (download, upload)
+
+    print(output)
+
+
+if __name__ == '__main__':
+
+    if '-t' in sys.argv:
+        today()
+    else:
+        month()
