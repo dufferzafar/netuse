@@ -16,7 +16,7 @@ import os
 join = os.path.join
 
 # Used for suggested internet usage calculation
-from datetime import date
+from datetime import date, timedelta
 
 ################################################################
 
@@ -142,7 +142,10 @@ def month():
     total_upload = calculate(read_files(up_filelist)) // (1024 * 1024)
 
     data_left = Total_Data - total_download
-    days_left = (date(s_year, s_month + 1, s_day) - date.today()).days
+
+    start_date = date(s_year, s_month, s_day)
+    end_date = start_date + timedelta(days=30)
+    days_left = (end_date - date.today()).days
 
     suggested = data_left // days_left
 
