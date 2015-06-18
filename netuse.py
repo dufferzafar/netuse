@@ -43,6 +43,8 @@ Logfiles_Path = os.path.expanduser("~/.net/")
 ################################################################
 
 
+MB = 1024 * 1024
+
 s_day, s_month, s_year = map(int, Start_Period.split("/"))
 
 
@@ -120,13 +122,10 @@ def calculate(lst):
         if duration <= Epoch_Diff:
             if usage >= 0:
                 total += usage
-                # print(">0", total, usage)
             else:
                 total += current[0]
-                # print("E1", total, current[0])
         else:
             total += current[0]
-            # print("E2", total, current[0])
 
         previous = current
 
@@ -138,8 +137,8 @@ def month():
 
     down_filelist, up_filelist = gen_file_list()
 
-    total_download = calculate(read_files(down_filelist)) // (1024 * 1024)
-    total_upload = calculate(read_files(up_filelist)) // (1024 * 1024)
+    total_download = calculate(read_files(down_filelist)) // MB
+    total_upload = calculate(read_files(up_filelist)) // MB
 
     data_left = Total_Data - total_download
 
@@ -163,11 +162,10 @@ def month():
 def today():
     t = date.today()
 
-    download = calculate(read_files(
-        [join(Logfiles_Path, t.strftime('%b'), "down", t.strftime('%d'))])) // (1024 * 1024)
+    path = join(Logfiles_Path, t.strftime('%b'), "%s", t.strftime('%d'))
 
-    upload = calculate(read_files(
-        [join(Logfiles_Path, t.strftime('%b'), "up", t.strftime('%d'))])) // (1024 * 1024)
+    download = calculate(read_files([path % "down"])) // MB
+    upload = calculate(read_files([path % "up"])) // MB
 
     output = (
         "Downloaded:\t%4d MB \n"
