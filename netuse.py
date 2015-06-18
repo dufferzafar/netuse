@@ -13,10 +13,12 @@ to write my custom shit.
 
 import sys
 import os
+
 join = os.path.join
 
 # Used for suggested internet usage calculation
 from datetime import date, timedelta
+from calendar import month_abbr as months
 
 ################################################################
 
@@ -40,8 +42,6 @@ Logfiles_Path = os.path.expanduser("~/.net/")
 
 ################################################################
 
-months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 s_day, s_month, s_year = map(int, Start_Period.split("/"))
 
@@ -53,7 +53,7 @@ def gen_file_list():
     up_filelist = []
 
     # Read in data from files and build a list
-    for month in months[s_month - 1:]:
+    for month in months[s_month:]:
 
         # Break when month doesn't yet exist
         if not os.path.isdir(join(Logfiles_Path, month)):
@@ -64,7 +64,7 @@ def gen_file_list():
         down_path = join(Logfiles_Path, month, "down")
         up_path = join(Logfiles_Path, month, "up")
 
-        if month == months[s_month - 1]:
+        if month == months[s_month]:
             days = range(s_day, 32)
         else:
             days = range(1, 32)
