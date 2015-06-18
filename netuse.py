@@ -43,6 +43,19 @@ Logfiles_Path = os.path.expanduser("~/.net/")
 ################################################################
 
 
+def correction(n):
+    """
+    Bug: For reasons I can't comprehend, the results are wrong.
+
+    My results differ significantly from what MTS shows me.
+
+    The correction factor, if it exists, will depend on, I guess.
+    the total data that has been downloaded till now.
+
+    This is a really crude hack - I have no idea what I am doing.
+    """
+    return n * 0.225
+
 MB = 1024 * 1024
 
 s_day, s_month, s_year = map(int, Start_Period.split("/"))
@@ -138,6 +151,8 @@ def month():
     down_filelist, up_filelist = gen_file_list()
 
     total_download = calculate(read_files(down_filelist)) // MB
+    total_download += correction(total_download)
+
     total_upload = calculate(read_files(up_filelist)) // MB
 
     data_left = Total_Data - total_download
