@@ -1,0 +1,5 @@
+# Configuration File
+
+# Copy Example: cp config.py.example config.py
+# Change your settings: vim config.py
+config.py

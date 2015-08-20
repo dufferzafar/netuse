@@ -14,33 +14,25 @@ to write my custom shit.
 import sys
 import os
 
-join = os.path.join
-
 # Used for suggested internet usage calculation
 from datetime import date, timedelta
 from calendar import month_abbr as months
 
-################################################################
+# Load settings from config file
+from config import (
+    Start_Period,
+    Days_In_Month,
+    Total_Data,
+    Epoch_Diff,
+    Correction_Factor,
+    Logfiles_Path,
+)
+
+
+join = os.path.join
 
 # Convert string to integer, empty string is zero.
 to_int = lambda s: int(s) if s.strip() else 0
-
-# Starting period
-# 'Date/Month'
-Start_Period = "25/01/2015"
-
-# Recharge this month
-# (in MBs)
-Total_Data = 7 * 1024
-
-# Difference between epochs of data points
-# (in seconds)
-Epoch_Diff = 10 * 60 + 5
-
-# Folder where log files are stored
-Logfiles_Path = os.path.expanduser("~/.net/")
-
-################################################################
 
 
 def correction(n):
@@ -54,7 +46,7 @@ def correction(n):
 
     This is a really crude hack - I have no idea what I am doing.
     """
-    return n * 0.225
+    return n * Correction_Factor
 
 MB = 1024 * 1024
 
@@ -158,7 +150,7 @@ def month():
     data_left = Total_Data - total_download
 
     start_date = date(s_year, s_month, s_day)
-    end_date = start_date + timedelta(days=30)
+    end_date = start_date + timedelta(days=Days_In_Month)
     days_left = (end_date - date.today()).days
 
     suggested = data_left // days_left

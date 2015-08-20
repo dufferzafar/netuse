@@ -1,0 +1,19 @@
+import os
+
+# Starting period - 'Date/Month'
+Start_Period = "17/08/2015"
+
+# Number of Days in a recharge month
+Days_In_Month = 28
+
+# Recharge this month (in MBs)
+Total_Data = 7 * 1024
+
+# Difference between epochs of data points (in seconds)
+Epoch_Diff = 10 * 60 + 5
+
+# Used as a hack to fix up the data
+Correction_Factor = 0.225
+
+# Folder where log files are stored
+Logfiles_Path = os.path.expanduser("~/.net/")
