@@ -1,0 +1,221 @@
+<head runat="server">
+  <!-- Todo: Change using js. Per Month. -->
+  <title>
+    Networx Plot
+  </title>
+  <style type="text/css">
+  text {
+    font-family: Arial;
+    font-size: 8pt;
+    fill: #787878;
+  }
+
+  line {
+    stroke: #cdcdcd;
+    stroke-width: 0.5;
+    stroke-dasharray: 3 3;
+    fill: none;
+  }
+
+  /* Adding path doesn't messes with the text labels on Axis */
+  .axis path {
+    stroke: #cdcdcd;
+    stroke-width: 1;
+    fill: none;
+  }
+
+  .line {
+    stroke-width: 2;
+    stroke-dasharray: 0;
+    fill: none;
+  }
+
+  .up {
+    stroke: #ff2c14;
+  }
+
+  .uparea {
+    fill: rgba(252,48,90,0.8);
+  }
+
+  .down {
+    stroke: #025ec4;
+  }
+
+  .downarea {
+    fill: rgba(108,177,253,0.8);
+  }
+
+  .time {
+    stroke: #478c21;
+  }
+
+  .timearea {
+    fill: rgba(101,197,47,1);
+  }
+  </style>
+  <script src = "assets/d3.v3.min.js"></script>
+  <script src = "dataset.js"></script>
+</head>
+
+<body>
+<script type="text/javascript">
+
+  //Todo: Fix this shit!
+  var margin = { top: 20, right: 20, bottom: 30, left: 50 },
+      width = 900 - margin.left - margin.right,
+      height = 550 - margin.top - margin.bottom;
+
+  upYear = [] ;
+  timeYear = []
+  downYear = [] ;
+
+  for (var i = 1; i <= 12; i++)
+  {
+    upYear = upYear.concat(upload[i]);
+    timeYear = timeYear.concat(time[i]);
+    downYear = downYear.concat(download[i]);
+  };
+
+  var num = 12;
+
+  for (var i = 1; i <= num; i++) {
+    plot(download[i], upload[i], time[i]);
+  };
+
+  // plot(downYear, upYear, timeYear);
+  // plot(download[3], upload[3], time[3]);
+
+  /**
+   * Plot various datasets to graph
+   *
+   * @param  {array}  downBytes   An array containing the values to plot as downloaded data (in MBs).
+   * @param  {array}  upBytes     An array contatining the values to plot as uploaded data (in MBs).
+   * @param  {array}  time        An array contatining the values to plot as time points (in hour).
+   *
+   * @returns nothing
+   */
+  function plot(downBytes, upBytes, time)
+  {
+
+    // The D3 Scales.
+    var x = d3.scale.linear()
+        .domain([0, downBytes.length-1])
+        .range([0, width]);
+
+    var y = d3.scale.linear()
+        .domain([0, d3.max(downBytes, function (d) { return Math.floor(d/1000000)+100; }) ])
+        .range([height, 0]);
+
+    var yTime = d3.scale.linear()
+        .domain([0, d3.max(time, function (d) { return Math.floor(d/3600)+1; }) ])
+        .range([height, 0]);
+
+    // Scales to Axes
+    var xAxis = d3.svg.axis()
+      .scale(x)
+      .ticks(15)
+      .tickSize(-height)
+      .tickPadding(15)
+      .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .tickSize(-width)
+      .tickPadding(15)
+      .orient("left");
+
+    var yAxisTime = d3.svg.axis()
+      .scale(yTime)
+      .tickSize(-width)
+      .tickPadding(5)
+      .orient("right");
+
+    // Functions that plot lines and area
+    var lineBytes = d3.svg.line()
+        .x(function (d, i) { return x(i); })
+        .y(function (d, i) { return y(d/1000000); })
+        .interpolate("cardinal");
+
+    var areaBytes = d3.svg.area()
+       .x(function (d, i) {return x(i);})
+       .y0(500) // Todo: Make it variable not hardcoded.
+       .y1(function (d) { return y(d/1000000);})
+       .interpolate("cardinal");
+
+    var lineTime = d3.svg.line()
+        .x(function (d, i) { return x(i); })
+        .y(function (d, i) { return yTime(d/3600); })
+        .interpolate("cardinal");
+
+    var areaTime = d3.svg.area()
+       .x(function (d, i) {return x(i);})
+       .y0(500)
+       .y1(function (d) { return yTime(d/3600);})
+       .interpolate("cardinal");
+
+    // Drawing begins....
+
+    // The SVG Element
+    var svg = d3.select("body")
+      .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // date axis
+    svg
+      .append("g")
+        .call(xAxis)
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + height + ")");
+
+    // bytes axis
+    svg
+      .append("g")
+        .call(yAxis)
+        .attr("class", "axis");
+
+    // time axis
+    svg
+      .append("g")
+        .call(yAxisTime)
+        .attr("class", "axis")
+        .attr("transform", "translate(" + width + ", 0)");
+
+    // time line and area
+    svg
+      .append("path")
+        .attr("class", "time line")
+        .attr("d", lineTime(time));
+
+    svg
+      .append('path')
+        .attr("class", "timearea")
+        .attr("d", areaTime(time));
+
+    // downloaded line and area
+    svg
+      .append("path")
+        .attr("class", "down line")
+        .attr("d", lineBytes(downBytes));
+
+    svg
+      .append('path')
+        .attr("class", "downarea")
+        .attr("d", areaBytes(downBytes));
+
+    // uploaded line and area
+    svg
+      .append("path")
+        .attr("class", "up line")
+        .attr("d", lineBytes(upBytes));
+
+    svg
+      .append('path')
+        .attr("class", "uparea")
+        .attr("d", areaBytes(upBytes));
+  }
+</script>
+</body>
