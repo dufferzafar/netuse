@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# This script dumps the bandwidth stats to files
+# which are then processed by netuse script.
+
+# crontab entry:
+# */10 * * * * /path/to/dumper
+
+date=`date +%d`
+month=`date +%b`
+
+# Make sure the directories exist
+mkdir -p ~/.net/$month/down
+mkdir -p ~/.net/$month/up
+
+# I use an MTS MBlaze Dongle - www.mtsindia.in/mblaze/
+# which registers itself as a ppp device.
+echo $(cat /sys/class/net/ppp0/statistics/rx_bytes)";"$(date +%s) >> ~/.net/$month/down/$date
+echo $(cat /sys/class/net/ppp0/statistics/tx_bytes)";"$(date +%s) >> ~/.net/$month/up/$date
