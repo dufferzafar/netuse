@@ -53,6 +53,21 @@ MB = 1024 * 1024
 s_day, s_month, s_year = map(int, Start_Period.split("/"))
 
 
+def gen_year_months():
+    assert(Days_In_Month < 30)
+
+    ym = []
+
+    if s_month == 12:
+        ym.append((str(s_year), "Dec"))
+        ym.append((str(s_year + 1), "Jan"))
+    else:
+        ym.append((str(s_year), months[s_month]))
+        ym.append((str(s_year), months[s_month+1]))
+
+    return ym
+
+
 def gen_file_list():
     """ Generate a list of files to read in. """
 
@@ -60,16 +75,16 @@ def gen_file_list():
     up_filelist = []
 
     # Read in data from files and build a list
-    for month in months[s_month:]:
+    for year, month in gen_year_months():
 
         # Break when month doesn't yet exist
-        if not os.path.isdir(join(Logfiles_Path, month)):
+        if not os.path.isdir(join(Logfiles_Path, year, month)):
             break
 
         print("%s: " % month, end='')
 
-        down_path = join(Logfiles_Path, month, "down")
-        up_path = join(Logfiles_Path, month, "up")
+        down_path = join(Logfiles_Path, year, month, "down")
+        up_path = join(Logfiles_Path, year, month, "up")
 
         if month == months[s_month]:
             days = range(s_day, 32)
@@ -169,7 +184,7 @@ def month():
 def today():
     t = date.today()
 
-    path = join(Logfiles_Path, t.strftime('%b'), "%s", t.strftime('%d'))
+    path = join(Logfiles_Path, t.strftime('%G'), t.strftime('%b'), "%s", t.strftime('%d'))
 
     download = calculate(read_files([path % "down"])) // MB
     upload = calculate(read_files([path % "up"])) // MB
