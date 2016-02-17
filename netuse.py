@@ -16,7 +16,6 @@ import os
 
 # Used for suggested internet usage calculation
 from datetime import date, timedelta
-from calendar import month_abbr as months
 
 # Load settings from config file
 from config import (
@@ -40,6 +39,10 @@ def to_int(s):
         return 0
 
 
+def daterange(start_date, end_date):
+    """Iterate over a range of dates. Both ends inclusive."""
+    for n in range(int ((end_date - start_date).days) + 1):
+        yield start_date + timedelta(n)
 
 
 def correction(n):
@@ -60,58 +63,27 @@ MB = 1024 * 1024
 s_day, s_month, s_year = map(int, Start_Period.split("/"))
 
 
-def gen_year_months():
-    assert(Days_In_Month < 30)
-
-    ym = []
-
-    if s_month == 12:
-        ym.append((str(s_year), "Dec"))
-        ym.append((str(s_year + 1), "Jan"))
-    else:
-        ym.append((str(s_year), months[s_month]))
-        ym.append((str(s_year), months[s_month+1]))
-
-    return ym
-
-
 def gen_file_list():
     """ Generate a list of files to read in. """
 
     down_filelist = []
     up_filelist = []
 
-    # Read in data from files and build a list
-    for year, month in gen_year_months():
+    start_date = date(s_year, s_month, s_day)
+    end_date = date.today()
 
-        # Break when month doesn't yet exist
-        if not os.path.isdir(join(Logfiles_Path, year, month)):
-            break
+    for din in daterange(start_date, end_date):
+        down_path = join(Logfiles_Path, str(din.year), din.strftime('%b'), "down")
+        up_path = join(Logfiles_Path, str(din.year), din.strftime('%b'), "up")
 
-        print("%s: " % month, end='')
+        day = "%02d" % din.day
 
-        down_path = join(Logfiles_Path, year, month, "down")
-        up_path = join(Logfiles_Path, year, month, "up")
+        # Skip when day doesn't exist
+        if not os.path.isfile(join(down_path, day)):
+            continue
 
-        if month == months[s_month]:
-            days = range(s_day, 32)
-        else:
-            days = range(1, 32)
-
-        for day in days:
-            day = "%02d" % day
-
-            # Skip when day doesn't exist
-            if not os.path.isfile(join(down_path, day)):
-                continue
-
-            print("%s, " % day, end='')
-
-            # Read in the up/down logs
-            down_filelist.append(join(down_path, day))
-            up_filelist.append(join(up_path, day))
-
-        print('\n')
+        down_filelist.append(join(down_path, day))
+        up_filelist.append(join(up_path, day))
 
     return down_filelist, up_filelist
 
