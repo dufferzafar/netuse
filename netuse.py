@@ -31,8 +31,15 @@ from config import (
 
 join = os.path.join
 
-# Convert string to integer, empty string is zero.
-to_int = lambda s: int(s) if s.strip() else 0
+
+def to_int(s):
+    """Convert string to integer, empty string is zero."""
+    if s.strip() and s.strip('\0'):
+        return int(s)
+    else:
+        return 0
+
+
 
 
 def correction(n):
