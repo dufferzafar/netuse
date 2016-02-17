@@ -91,23 +91,23 @@ def gen_file_list():
 def read_files(files):
     """ Read files and generate tuples of (data,epoch). """
 
-    lst = []
+    tuples = []
 
     for _file in files:
         with open(_file) as f:
-            lst.extend([tuple(map(to_int, s.split(";")))
-                        for s in f.readlines()])
+            tuples.extend([tuple(map(to_int, s.split(";")))
+                           for s in f.readlines()])
 
-    return lst
+    return tuples
 
 
-def calculate(lst):
+def calculate(tuples):
     """ Calculate actual data usage from the list of tuples. """
 
     total = 0
     previous = (0, 0)
 
-    for current in lst:
+    for current in tuples:
 
         # Some of the data has no epoch entries
         # only byte usage for that day
@@ -118,11 +118,8 @@ def calculate(lst):
         usage = current[0] - previous[0]
         duration = current[1] - previous[1]
 
-        if duration <= EPOCH_DIFF:
-            if usage >= 0:
-                total += usage
-            else:
-                total += current[0]
+        if duration <= EPOCH_DIFF and usage >= 0:
+            total += usage
         else:
             total += current[0]
 
