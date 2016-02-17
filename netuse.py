@@ -19,12 +19,12 @@ from datetime import date, timedelta
 
 # Load settings from config file
 from config import (
-    Start_Period,
-    Days_In_Month,
-    Total_Data,
-    Epoch_Diff,
-    Correction_Factor,
-    Logfiles_Path,
+    START_PERIOD,
+    DAYS_IN_MONTH,
+    TOTAL_DATA,
+    EPOCH_DIFF,
+    CORRECTION_FACTOR,
+    LOGFILES_PATH,
 )
 
 
@@ -41,7 +41,7 @@ def to_int(s):
 
 def daterange(start_date, end_date):
     """Iterate over a range of dates. Both ends inclusive."""
-    for n in range(int ((end_date - start_date).days) + 1):
+    for n in range(int((end_date - start_date).days) + 1):
         yield start_date + timedelta(n)
 
 
@@ -56,11 +56,11 @@ def correction(n):
 
     This is a really crude hack - I have no idea what I am doing.
     """
-    return n * Correction_Factor
+    return n * CORRECTION_FACTOR
 
 MB = 1024 * 1024
 
-s_day, s_month, s_year = map(int, Start_Period.split("/"))
+s_day, s_month, s_year = map(int, START_PERIOD.split("/"))
 
 
 def gen_file_list():
@@ -73,8 +73,8 @@ def gen_file_list():
     end_date = date.today()
 
     for din in daterange(start_date, end_date):
-        down_path = join(Logfiles_Path, str(din.year), din.strftime('%b'), "down")
-        up_path = join(Logfiles_Path, str(din.year), din.strftime('%b'), "up")
+        down_path = join(LOGFILES_PATH, str(din.year), din.strftime('%b'), "down")
+        up_path = join(LOGFILES_PATH, str(din.year), din.strftime('%b'), "up")
 
         day = "%02d" % din.day
 
@@ -118,7 +118,7 @@ def calculate(lst):
         usage = current[0] - previous[0]
         duration = current[1] - previous[1]
 
-        if duration <= Epoch_Diff:
+        if duration <= EPOCH_DIFF:
             if usage >= 0:
                 total += usage
             else:
@@ -141,10 +141,10 @@ def month():
 
     total_upload = calculate(read_files(up_filelist)) // MB
 
-    data_left = Total_Data - total_download
+    data_left = TOTAL_DATA - total_download
 
     start_date = date(s_year, s_month, s_day)
-    end_date = start_date + timedelta(days=Days_In_Month)
+    end_date = start_date + timedelta(days=DAYS_IN_MONTH)
     days_left = (end_date - date.today()).days
 
     suggested = data_left // days_left
@@ -163,7 +163,7 @@ def month():
 def today():
     t = date.today()
 
-    path = join(Logfiles_Path, t.strftime('%G'), t.strftime('%b'), "%s", t.strftime('%d'))
+    path = join(LOGFILES_PATH, t.strftime('%G'), t.strftime('%b'), "%s", t.strftime('%d'))
 
     download = calculate(read_files([path % "down"])) // MB
     upload = calculate(read_files([path % "up"])) // MB
