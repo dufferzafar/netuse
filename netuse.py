@@ -146,15 +146,16 @@ def month():
 
     suggested = data_left // days_left
 
-    output = (
-        "Downloaded:\t%4d MB \n"
-        "Uploaded:\t%4d MB \n\n"
-        "Data Left:\t%4d MB \n"
-        "Days Left:\t%4d Days \n\n"
-        "Suggested:\t%4d MB (Per Day) \n"
-    ) % (total_download, total_upload, data_left, days_left, suggested)
+    output = [
+        "Downloaded:\t%4d MB" % total_download,
+        "Uploaded:\t%4d MB\n" % total_upload,
+        "Data Left:\t%4d MB" % data_left,
+        # "Days Left:\t%4d Days" % days_left,
+        "End Date:\t%s (11:59 PM)\n" % end_date,
+        "Suggested:\t%4d MB (Per Day)" % suggested,
+    ]
 
-    print(output)
+    print("\n".join(output))
 
 
 def today():
