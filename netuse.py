@@ -11,6 +11,10 @@ import os
 # Used for calculating suggested internet usage
 from datetime import date, timedelta
 
+# Not a module on PyPI.
+# Stored in the same directory as this file.
+import termgraph
+
 # Load settings from config file
 # See file 'config.py.example' for what the settings mean.
 from config import (
@@ -150,7 +154,49 @@ def daily(t=date.today()):
     print(output)
 
 
+def weekly():
+    """
+    Use termgraph to plot usage of this week.
+
+    Data is aggregated according to days.
+    """
+
+    # Get this month's file list
+    down_filelist, _ = gen_file_list()
+
+    # Iterate over every file in this week
+    week = {}
+    for file in down_filelist[-7:]:
+        week[file.split('/')[-1]] = calculate(read_files([file])) // MB
+
+    data = sorted(week.items())
+
+    print("Data downloaded this week:\n")
+    termgraph.chart(
+        labels=["%s%s" % (d[0], ordinal_suffix(int(d[0]))) for d in data],
+        data=[d[1] for d in data],
+        args=dict(
+            width=30,
+            suffix=" MB",
+            format="{:>5.0f}",
+        )
+    )
+
+    print("Total: %d MB" % sum([d[1] for d in data]))
+
+
+
 ################################################################# Helper functions
+
+
+def ordinal_suffix(d):
+    """
+    Return ordnial suffixes for an integer.
+
+    Taken from: http://stackoverflow.com/a/5891598/2043048
+    """
+    return 'th' if 11 <= d <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(d % 10, 'th')
+
 
 def to_int(s):
     """Convert string to integer, empty string is zero."""
@@ -186,5 +232,7 @@ if __name__ == '__main__':
     # FIXME: Replace this with something 'real' like docopt/click
     if '-t' in sys.argv:
         daily()
+    elif '-w' in sys.argv:
+        weekly()
     else:
         monthly()
