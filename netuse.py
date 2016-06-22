@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
 """
-Calculate internet usage from log files created
-by a custom script, and display statistics.
+Calculate internet usage from log files created by a custom script.
+
+Can also display stats like suggested usage, weekly report etc.
 """
 
 import sys
@@ -11,8 +12,8 @@ import os
 # Used for calculating suggested and hourly internet usage
 from datetime import date, timedelta, datetime
 
-# Not a module on PyPI.
-# Stored in the same directory as this file.
+# Print bar charts to terminal
+# Not a module on PyPI
 import termgraph
 
 # Load settings from config file
@@ -188,7 +189,6 @@ def weekly():
 def hourly():
     """Calculate usage of last hour."""
 
-################################################################# Helper functions
     # Read today's file
     t = date.today()
     path = join(LOGFILES_PATH, t.strftime('%G'), t.strftime('%b'), "%s", t.strftime('%d'))
@@ -206,6 +206,8 @@ def hourly():
 
     return hourly_usage
 
+
+# ================================================================ Helper functions
 
 
 def ordinal_suffix(d):
