@@ -138,7 +138,7 @@ def month():
 
     total_upload = calculate(read_files(up_filelist)) // MB
 
-    data_left = TOTAL_DATA - total_download
+    data_left = TOTAL_DATA - total_download - total_upload
 
     start_date = date(s_year, s_month, s_day)
     end_date = start_date + timedelta(days=DAYS_IN_MONTH)
