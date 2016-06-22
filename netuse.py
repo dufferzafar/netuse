@@ -31,33 +31,6 @@ from config import (
 join = os.path.join
 
 
-def to_int(s):
-    """Convert string to integer, empty string is zero."""
-    if s.strip() and s.strip('\0'):
-        return int(s)
-    else:
-        return 0
-
-
-def daterange(start_date, end_date):
-    """Iterate over a range of dates. Both ends inclusive."""
-    for n in range(int((end_date - start_date).days) + 1):
-        yield start_date + timedelta(n)
-
-
-def correction(n):
-    """
-    Bug: For reasons I can't comprehend, the results are wrong.
-
-    My results differ significantly from what MTS shows me.
-
-    The correction factor, if it exists, will depend on, I guess.
-    the total data that has been downloaded till now.
-
-    This is a really crude hack - I have no idea what I am doing.
-    """
-    return n * CORRECTION_FACTOR
-
 MB = 1024 * 1024
 
 s_day, s_month, s_year = map(int, START_PERIOD.split("/"))
@@ -173,6 +146,35 @@ def today():
 
     print(output)
 
+
+################################################################# Helper functions
+
+def to_int(s):
+    """Convert string to integer, empty string is zero."""
+    if s.strip() and s.strip('\0'):
+        return int(s)
+    else:
+        return 0
+
+
+def daterange(start_date, end_date):
+    """Iterate over a range of dates. Both ends inclusive."""
+    for n in range(int((end_date - start_date).days) + 1):
+        yield start_date + timedelta(n)
+
+
+def correction(n):
+    """
+    For reasons I can't comprehend, the results are wrong.
+
+    My results differ significantly from what MTS shows me.
+
+    The correction factor, if it exists, will depend on, the
+    total data that has been downloaded till now.
+
+    This is a really crude hack - I have no idea what I am doing.
+    """
+    return n * CORRECTION_FACTOR
 
 if __name__ == '__main__':
 
