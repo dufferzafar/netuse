@@ -131,8 +131,7 @@ def month():
     print("\n".join(output))
 
 
-def today():
-    t = date.today()
+def daily(t=date.today()):
 
     path = join(LOGFILES_PATH, t.strftime('%G'), t.strftime('%b'), "%s", t.strftime('%d'))
 
@@ -179,6 +178,6 @@ def correction(n):
 if __name__ == '__main__':
 
     if '-t' in sys.argv:
-        today()
+        daily()
     else:
         month()
