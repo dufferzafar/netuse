@@ -1,23 +1,18 @@
 #!/usr/bin/python3
 
 """
-
 Calculate internet usage from log files created
-by a custom script.
-
-While on windows, I had Networx monitor which used
-to take care of everything but now I've been forced
-to write my custom shit.
-
+by a custom script, and display statistics.
 """
 
 import sys
 import os
 
-# Used for suggested internet usage calculation
+# Used for calculating suggested internet usage
 from datetime import date, timedelta
 
 # Load settings from config file
+# See file 'config.py.example' for what the settings mean.
 from config import (
     START_DATE,
     DAYS_IN_MONTH,
@@ -27,17 +22,18 @@ from config import (
     LOGFILES_PATH,
 )
 
+# How many bytes in an MB?
+MB = 1024 * 1024
 
+# Ideally, these values shouldn't be globals but passed around to functions!
+s_day, s_month, s_year = map(int, START_DATE.split("/"))
+
+# not (Explicit is better than implicit)
 join = os.path.join
 
 
-MB = 1024 * 1024
-
-s_day, s_month, s_year = map(int, START_DATE.split("/"))
-
-
 def gen_file_list():
-    """ Generate a list of files to read in. """
+    """Generate a list of 'monthly' files to read in."""
 
     down_filelist = []
     up_filelist = []
@@ -62,7 +58,7 @@ def gen_file_list():
 
 
 def read_files(files):
-    """ Read files and generate tuples of (data,epoch). """
+    """Read files and generate tuples of (data, epoch)."""
 
     tuples = []
 
@@ -75,7 +71,7 @@ def read_files(files):
 
 
 def calculate(tuples):
-    """ Calculate actual data usage from the list of tuples. """
+    """Calculate actual data usage from the list of tuples."""
 
     total = 0
     previous = tuples[0]
@@ -132,7 +128,9 @@ def month():
 
 
 def daily(t=date.today()):
+    """Print stats for a single day, default today."""
 
+    # Path of day's file
     path = join(LOGFILES_PATH, t.strftime('%G'), t.strftime('%b'), "%s", t.strftime('%d'))
 
     download = calculate(read_files([path % "down"])) // MB
@@ -175,8 +173,11 @@ def correction(n):
     """
     return n * CORRECTION_FACTOR
 
+
+# If I am being called directly (rather than being imported)
 if __name__ == '__main__':
 
+    # FIXME: Replace this with something 'real' like docopt/click
     if '-t' in sys.argv:
         daily()
     else:
