@@ -1,7 +1,7 @@
 import os
 
 # Starting period - 'Date/Month'
-START_PERIOD = "17/08/2015"
+START_DATE = "01/06/2016"
 
 # Number of Days in a recharge month
 DAYS_IN_MONTH = 28

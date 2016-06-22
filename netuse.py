@@ -19,7 +19,7 @@ from datetime import date, timedelta
 
 # Load settings from config file
 from config import (
-    START_PERIOD,
+    START_DATE,
     DAYS_IN_MONTH,
     TOTAL_DATA,
     EPOCH_DIFF,
@@ -33,7 +33,7 @@ join = os.path.join
 
 MB = 1024 * 1024
 
-s_day, s_month, s_year = map(int, START_PERIOD.split("/"))
+s_day, s_month, s_year = map(int, START_DATE.split("/"))
 
 
 def gen_file_list():
