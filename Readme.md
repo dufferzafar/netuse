@@ -2,7 +2,20 @@
 
 While on Windows, I used [Networx](https://www.softperfect.com/products/networx/) to track my bandwidth usage, but I couldn't find anything similar for Linux so I created my own little thing - it's far from being perfect, but hey, it works!
 
+## Screenshots
+
+
+**Standard statistics:**
+
 ![Screenshot](screenshot.png)
+
+**Week at a glance:**
+
+![Week at a glance](screenshot-week.png)
+
+**Hourly Usage Notification:**
+
+![Week at a glance](screenshot-noti-screen.png)
 
 ## Design
 
