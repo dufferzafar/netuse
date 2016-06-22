@@ -1,19 +1,25 @@
 import os
 
-# Starting period - 'Date/Month'
+# Date on which your current 'recharge month' begins
+# in 'DD/MM/YYYY' format
 START_DATE = "01/06/2016"
 
 # Number of Days in a recharge month
 DAYS_IN_MONTH = 28
 
 # Recharge this month (in MBs)
-TOTAL_DATA = 7 * 1024
+# Total data that is available to you for this month.
+TOTAL_DATA = 10 * 1024
 
 # Difference between epochs of data points (in seconds)
-EPOCH_DIFF = 10 * 60 + 5
+# The default setting applies if you're running the dumping cron job
+# every 2 minutes.
+EPOCH_DIFF = 2 * 60 + 5
 
 # Used as a hack to fix up the data
-CORRECTION_FACTOR = 0.225
+# Set to 0 to not get into the nitty gritty.
+CORRECTION_FACTOR = 0
 
 # Folder where log files are stored
+# The directory should exist!
 LOGFILES_PATH = os.path.expanduser("~/.net/")
