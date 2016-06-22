@@ -97,34 +97,40 @@ def calculate(tuples):
     return total
 
 
-def month():
-    """ Print stats for the current month. """
+def calculate_monthly_stats():
+    """Calculate stats for the current month."""
 
     down_filelist, up_filelist = gen_file_list()
 
-    total_download = calculate(read_files(down_filelist)) // MB
-    total_download += correction(total_download)
+    total_down = calculate(read_files(down_filelist)) // MB
+    total_down += correction(total_down)
 
-    total_upload = calculate(read_files(up_filelist)) // MB
+    total_up = calculate(read_files(up_filelist)) // MB
 
-    data_left = TOTAL_DATA - total_download - total_upload
+    data_left = TOTAL_DATA - total_down - total_up
 
     start_date = date(s_year, s_month, s_day)
     end_date = start_date + timedelta(days=DAYS_IN_MONTH)
-    days_left = (end_date - date.today()).days
 
+    days_left = (end_date - date.today()).days
     suggested = data_left // days_left
 
+    return total_down, total_up, data_left, days_left, end_date, suggested
+
+
+def monthly():
+    """Print the monthly stats month."""
+
     output = [
-        "Downloaded:\t%4d MB" % total_download,
-        "Uploaded:\t%4d MB\n" % total_upload,
-        "Data Left:\t%4d MB" % data_left,
-        # "Days Left:\t%4d Days" % days_left,
-        "End Date:\t%s (11:59 PM)\n" % end_date,
-        "Suggested:\t%4d MB (Per Day)" % suggested,
+        "Downloaded:\t%4d MB",
+        "Uploaded:\t%4d MB\n",
+        "Data Left:\t%4d MB",
+        "Days Left:\t%4d Days",
+        "End Date:\t%s (11:59 PM)\n",
+        "Suggested:\t%4d MB (Per Day)",
     ]
 
-    print("\n".join(output))
+    print("\n".join(output) % calculate_monthly_stats())
 
 
 def daily(t=date.today()):
@@ -133,13 +139,13 @@ def daily(t=date.today()):
     # Path of day's file
     path = join(LOGFILES_PATH, t.strftime('%G'), t.strftime('%b'), "%s", t.strftime('%d'))
 
-    download = calculate(read_files([path % "down"])) // MB
-    upload = calculate(read_files([path % "up"])) // MB
+    down = calculate(read_files([path % "down"])) // MB
+    up = calculate(read_files([path % "up"])) // MB
 
     output = (
         "Downloaded:\t%4d MB \n"
         "Uploaded:\t%4d MB \n"
-    ) % (download, upload)
+    ) % (down, up)
 
     print(output)
 
@@ -181,4 +187,4 @@ if __name__ == '__main__':
     if '-t' in sys.argv:
         daily()
     else:
-        month()
+        monthly()
