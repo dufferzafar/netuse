@@ -1,9 +1,10 @@
 # Network Data Usage
 
-While on Windows, I used [Networx](https://www.softperfect.com/products/networx/) to track my bandwidth usage, but I couldn't find anything similar for Linux so I created my own little thing - it's far from being perfect, but hey, it works!
+I live on a prepaid internet plan that is usually capped to around 7 GBs per month. Monitoring my bandwidth usage is critical for me.
+
+While on Windows, I used [Networx](https://www.softperfect.com/products/networx/) to track my usage, but I couldn't find anything similar for Linux so I created my own little thing - it's far from being perfect, but hey, it works!
 
 ## Screenshots
-
 
 **Standard statistics:**
 
@@ -42,3 +43,13 @@ To also setup hourly usage notifications:
 
     0 * * * * /usr/bin/netuse -n
 
+## Future Ideas and TODOs
+
+* Icons in notifications
+
+* Use `bokeh` to chart out the data?
+
+* Handle Day Night Plan calculations.
+    * For monthly plans like: 10 GB Day, 10 GB Night.
+
+* Make this, the data dumping cron job and a network usage appindicator all a part of a single big application?
