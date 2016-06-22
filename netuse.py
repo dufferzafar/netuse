@@ -105,9 +105,9 @@ def calculate(tuples):
     """ Calculate actual data usage from the list of tuples. """
 
     total = 0
-    previous = (0, 0)
+    previous = tuples[0]
 
-    for current in tuples:
+    for current in tuples[1:]:
 
         # Some of the data has no epoch entries
         # only byte usage for that day
