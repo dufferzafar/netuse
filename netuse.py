@@ -8,8 +8,8 @@ by a custom script, and display statistics.
 import sys
 import os
 
-# Used for calculating suggested internet usage
-from datetime import date, timedelta
+# Used for calculating suggested and hourly internet usage
+from datetime import date, timedelta, datetime
 
 # Not a module on PyPI.
 # Stored in the same directory as this file.
@@ -185,8 +185,27 @@ def weekly():
     print("Total: %d MB" % sum([d[1] for d in data]))
 
 
+def hourly():
+    """Calculate usage of last hour."""
 
 ################################################################# Helper functions
+    # Read today's file
+    t = date.today()
+    path = join(LOGFILES_PATH, t.strftime('%G'), t.strftime('%b'), "%s", t.strftime('%d'))
+    tuples = read_files([path % "down"])
+
+    # Calculate timestamp of an hour ago
+    hour_ago = datetime.now() - timedelta(hours=1)
+    hour_ago_ts = int(hour_ago.strftime("%s"))
+
+    # Only keep tuples of the last hour
+    # whose timestamp is greater than last hour stamp
+    tuples = [t for t in tuples if t[1] > hour_ago_ts]
+
+    hourly_usage = calculate(tuples) // MB
+
+    return hourly_usage
+
 
 
 def ordinal_suffix(d):
@@ -234,5 +253,7 @@ if __name__ == '__main__':
         daily()
     elif '-w' in sys.argv:
         weekly()
+    elif '-h' in sys.argv:
+        print("Data downloaded in the last hour: %d MB" % hourly())
     else:
         monthly()
