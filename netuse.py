@@ -16,6 +16,10 @@ from datetime import date, timedelta, datetime
 # Not a module on PyPI
 import termgraph
 
+# A tiny wrapper over notify-send
+# Not a module on PyPI
+import notify
+
 # Load settings from config file
 # See file 'config.py.example' for what the settings mean.
 from config import (
@@ -207,6 +211,22 @@ def hourly():
     return hourly_usage
 
 
+def noti():
+    """Send notification about usage and the data remaining."""
+
+    _, _, data_left, _, _, suggested = calculate_monthly_stats()
+
+    # TODO: If end date is today, add a line about that too
+    # or maybe a custom alert?
+
+    title = "Remaining Data: %d MB" % data_left
+    body = "\n".join([
+        "You've downloaded %d MB in the last hour.",
+        "Suggested usage is %d MB per day."
+    ]) % (hourly(), suggested)
+
+    notify.send(title, body)
+
 # ================================================================ Helper functions
 
 
@@ -257,5 +277,7 @@ if __name__ == '__main__':
         weekly()
     elif '-h' in sys.argv:
         print("Data downloaded in the last hour: %d MB" % hourly())
+    elif '-n' in sys.argv:
+        noti()
     else:
         monthly()
