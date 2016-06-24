@@ -6,9 +6,7 @@
 # crontab entry:
 # */10 * * * * /path/to/dumper
 
-date=`date +%d`
-month=`date +%b`
-year=`date +%G`
+read -r date month year <<< "$(date '%d %b %G')"
 
 # Make sure the directories exist
 mkdir -p ~/.net/$year/$month/down
