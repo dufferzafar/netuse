@@ -6,15 +6,12 @@
 # crontab entry:
 # */10 * * * * /path/to/dumper
 
-date=`date +%d`
-month=`date +%b`
-year=`date +%G`
+read -r date month year <<< "$(date '%d %b %G')"
 
 # Make sure the directories exist
-mkdir -p ~/.net/$year/$month/down
-mkdir -p ~/.net/$year/$month/up
+mkdir -p "$HOME/.net/$year/$month/"{down,up}
 
 # I use an MTS MBlaze Dongle - www.mtsindia.in/mblaze/
 # which registers itself as a ppp device.
-echo $(cat /sys/class/net/ppp0/statistics/rx_bytes)";"$(date +%s) >> ~/.net/$year/$month/down/$date
-echo $(cat /sys/class/net/ppp0/statistics/tx_bytes)";"$(date +%s) >> ~/.net/$year/$month/up/$date
+printf "%s;%s\n" "$(< /sys/class/net/ppp0/statistics/rx_bytes)" "$(date +%s)" >> "$HOME/.net/$year/$month/down/$date"
+printf "%s;%s\n" "$(< /sys/class/net/ppp0/statistics/tx_bytes)" "$(date +%s)" >> "$HOME/.net/$year/$month/up/$date"
