@@ -42,9 +42,10 @@ join = os.path.join
 
 
 def gen_file_list():
-    """Generate a list of 'monthly' files to read in.
-    :returns: down_filelist, up_filelist
+    """
+    Generate a list of 'monthly' files to read in.
 
+    :returns: down_filelist, up_filelist
     """
 
     down_filelist = []
@@ -54,8 +55,7 @@ def gen_file_list():
     end_date = date.today()
 
     for din in daterange(start_date, end_date):
-        down_path = join(LOGFILES_PATH, str(din.year),
-                                                   din.strftime('%b'), "down")
+        down_path = join(LOGFILES_PATH, str(din.year), din.strftime('%b'), "down")
         up_path = join(LOGFILES_PATH, str(din.year), din.strftime('%b'), "up")
 
         day = "%02d" % din.day
@@ -71,9 +71,10 @@ def gen_file_list():
 
 
 def read_files(files):
-    """Read files and generate tuples of (data, epoch).
-    :returns: tuples
+    """
+    Read files and generate tuples of (data, epoch).
 
+    :returns: list of tuples
     """
 
     tuples = []
@@ -87,9 +88,10 @@ def read_files(files):
 
 
 def calculate(tuples):
-    """Calculate actual data usage from the list of tuples.
-    :returns: total
+    """
+    Calculate actual data usage from the list of tuples.
 
+    :returns: total_data
     """
 
     total = 0
@@ -117,10 +119,11 @@ def calculate(tuples):
 
 
 def calculate_monthly_stats():
-    """Calculate stats for the current month.
+    """
+    Calculate stats for the current month.
+
     :returns: total_down, total_up, data_left,
               days_left, end_date, suggested
-
     """
     down_filelist, up_filelist = gen_file_list()
 
@@ -141,9 +144,10 @@ def calculate_monthly_stats():
 
 
 def monthly():
-    """Print the monthly stats month.
+    """
+    Print the monthly stats month.
+
     :returns: None
-    
     """
 
     output = [
@@ -159,14 +163,14 @@ def monthly():
 
 
 def daily(t=date.today()):
-    """Print stats for a single day, default today.
-    :returns: None
+    """
+    Print stats for a single day, default today.
 
+    :returns: None
     """
 
     # Path of day's file
-    path = join(LOGFILES_PATH, t.strftime('%G'), t.strftime('%b'),
-                                                       "%s", t.strftime('%d'))
+    path = join(LOGFILES_PATH, t.strftime('%G'), t.strftime('%b'), "%s", t.strftime('%d'))
 
     down = calculate(read_files([path % "down"])) // MB
     up = calculate(read_files([path % "up"])) // MB
@@ -180,11 +184,11 @@ def daily(t=date.today()):
 
 
 def weekly():
-    """ Use termgraph to plot usage of this week. Data is 
-    aggregated according to days.
+    """
+    Use termgraph to plot usage of this week.
+    Data is aggregated according to days.
+
     :returns: None
-
-
     """
 
     # Get this month's file list
@@ -212,9 +216,10 @@ def weekly():
 
 
 def hourly():
-    """Calculate usage of last hour.
+    """
+    Calculate usage of last hour.
+
     :returns: hourly_usage
-    
     """
 
     # Read today's file
@@ -236,9 +241,10 @@ def hourly():
 
 
 def noti():
-    """Send notification about usage and the data remaining.
-    :returns: None
+    """
+    Send notification about usage and the data remaining.
 
+    :returns: None
     """
 
     _, _, data_left, _, _, suggested = calculate_monthly_stats()
@@ -254,11 +260,13 @@ def noti():
 
     notify.send(title, body)
 
-# ================================================================ Helper functions
+# =========================================================== Helper functions
 
 
 def ordinal_suffix(d):
-    """ Return ordnial suffixes for an integer.
+    """
+    Return ordnial suffixes for an integer.
+
     Taken from: http://stackoverflow.com/a/5891598/2043048
     """
     return 'th' if 11 <= d <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(d % 10, 'th')
@@ -273,9 +281,10 @@ def to_int(s):
 
 
 def daterange(start_date, end_date):
-    """Iterate over a range of dates. Both ends inclusive.
-    :returns: generator 
-    
+    """
+    Iterate over a range of dates. Both ends inclusive.
+
+    :returns: generator
     """
     for n in range(int((end_date - start_date).days) + 1):
         yield start_date + timedelta(n)
